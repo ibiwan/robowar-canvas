@@ -17,17 +17,26 @@ const rawBots = [
     cpu: 5,
     rawCode: `
       Start:
-        -1 speedx' STORE
+        -3 SPEEDX' STORE
+        5 SPEEDY' STORE
       Loop:
-        0 x = LeftWall IFG
-        300 x = RightWall IFG
+        0 X = LeftWall IFG
+        300 X = RightWall IFG
+        0 Y = TopWall IFG
+        300 Y = BottomWall IFG
         Loop JUMP
       LeftWall:
-        1 speedx' STORE
-        Loop Jump
+        SPEEDX ABS SPEEDX' STORE
+        Loop JUMP
       RightWall:
-        -1 speedx' STORE
-        Loop Jump
+        SPEEDX ABS CHS SPEEDX' STORE
+        Loop JUMP
+      TopWall:
+        SPEEDY ABS SPEEDY' STORE
+        Loop JUMP
+      BottomWall:
+        SPEEDY ABS CHS SPEEDY' STORE
+        Loop JUMP
       Stop:
         AIM 7 + AIM' STORE
         Stop JUMP
@@ -51,13 +60,13 @@ let bots;
 
 const updateDim = (x, speedx) => {
   x += speedx;
-  if (x > arenaSide) {
+  if (x >= arenaSide) {
     x = arenaSide;
-    speedx = 0;
+    // speedx = 0;
   }
-  if (x < 0) {
+  if (x <= 0) {
     x = 0;
-    speedx = 0;
+    // speedx = 0;
   }
 
   // console.log([x, speedx])
@@ -102,20 +111,15 @@ const update = () => {
   bots.forEach((bot) => {
     
     execChronon(bot, {});
-    
-    // console.log({bot})
-    // throw new Error('purple')
-    
-    // console.log({x, speedx});
-    
-      let { x, y, speedx, speedy, aim, dAim } = bot;
-      [x, speedx] = updateDim(x, speedx);
-      [y, speedy] = updateDim(y, speedy);
-      aim += dAim;
-      Object.assign(bot, {x, speedx, y, speedy, aim, dAim})
-            
-      drawBot(ctx, bot);
-    });
+        
+    let { x, y, speedx, speedy, aim, dAim } = bot;
+    [x, speedx] = updateDim(x, speedx);
+    [y, speedy] = updateDim(y, speedy);
+    aim += dAim;
+    Object.assign(bot, {x, speedx, y, speedy, aim, dAim})
+          
+    drawBot(ctx, bot);
+  });
 
   setTimeout(update, rate - (new Date().getTime() - startTime));
 };
