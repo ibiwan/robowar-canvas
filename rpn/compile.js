@@ -1,18 +1,13 @@
-const compile = (bot) => {
-  const { rawCode } = bot;
+import { keywords } from './keywords/constants.js';
 
-  Array.prototype.tap = function (f) {
-    f(this);
-    return this;
-  };
-
+export const compile = (rawCode) => {
   const compiledCode = rawCode
     // split by lines
     .split(new RegExp("[\n\r]"))
 
     // add line numbers for later debugging
     .map((src, lineNo) => ({ src, lineNo }))
-    
+
     // remove comments
     .map(({ src, ...rest }) => ({
       ...rest,
@@ -49,7 +44,7 @@ const compile = (bot) => {
 
         if (src.endsWith(":")) {
           const label = src.slice(0, -1);
-          if(keywords.includes(label)){
+          if (keywords.includes(label)) {
             throw new Error("INVALID LABEL:", label)
           }
           labels[label] = symbols.length; // idx
@@ -67,11 +62,5 @@ const compile = (bot) => {
       }
     );
 
-  return {
-    ...bot,
-    compiledCode,
-    index: 0, // current instruction
-    stack: getNewStack(), // RPN stack
-    queue: [], // instructions to be executed by game engine
-  };
+  return compiledCode;
 };
